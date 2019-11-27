@@ -14,7 +14,7 @@ const baseRequest = request.defaults({
 
 //  Function that returns all sites qand prints vital info to the terminal
 function GetAllSites(target) {
-    if (target  === undefined){ target = "sites" }
+    if (target === undefined){ target = "sites" }
     baseRequest.get(target, function(err, res, body) {
         if (err) {
             console.log(err);
