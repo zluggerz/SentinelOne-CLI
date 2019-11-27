@@ -1,0 +1,24 @@
+{
+  "name": "sentinelone",
+  "version": "1.0.0",
+  "description": "Package to interact with Sentinel One API",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Sentinel",
+    "One"
+  ],
+  "author": "Ted Williams",
+  "license": "ISC",
+  "bin": {
+    "sentinelone-cli": "./bin/index.js"
+  },
+  "dependencies": {
+    "cli-table": "^0.3.1",
+    "dotenv": "^8.2.0",
+    "request": "^2.88.0",
+    "yargs": "^15.0.2"
+  }
+}
