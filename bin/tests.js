@@ -12,6 +12,7 @@ const baseRequest = request.defaults({
     }
 });
 
+//  Function that returns all sites qand prints vital info to the terminal
 function GetAllSites(target) {
     if (target  === undefined){ target = "sites" }
     baseRequest.get(target, function(err, res, body) {
@@ -26,32 +27,7 @@ function GetAllSites(target) {
             })
             if (info.pagination.nextCursor !== null) {
                 GetAllSites("sites?cursor=" + info.pagination.nextCursor);
-            } else {
-                sites.forEach(s => {
-                    if (s.state !== 'deleted') {
-                        let disp = new table();
-                        disp.push(
-                            { 'Name': s.name },
-                            { 'ID': s.id },
-                            { 'Token': s.registrationToken }
-                        );
-                        console.log(disp.toString());
-                    }
-                });
             }
-        } else {
-            console.log("HTTP Status Code: " + res.statusCode);
-            console.log(body);
-        }
-    })
-}
-
-// // Function that returns all sites.
-function GetSites() {
-    baseRequest.get("sites", function(err, res, body) {
-        if (!err && res.statusCode == 200) {
-            let info = JSON.parse(body);
-            let sites = info.data.sites;
             sites.forEach(s => {
                 if (s.state !== 'deleted') {
                     let disp = new table();
@@ -62,14 +38,12 @@ function GetSites() {
                     );
                     console.log(disp.toString());
                 }
-            })
-        } else if (err) {
-            console.log(err);
+            });
         } else {
             console.log("HTTP Status Code: " + res.statusCode);
             console.log(body);
         }
-    });
+    })
 }
 
 //  Function to Get a Site by Token
