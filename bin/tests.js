@@ -159,6 +159,59 @@ function GetAgents(siteId, target) {
     })
 }
 
+function ScanAgentsBySite(siteId) {
+    let payload = {
+        "filter": {
+            "locationIds": [
+                siteId
+            ]
+        }
+    }
+    baseRequest.post({
+        uri: 'agents/actions/initiate-scan',
+        body: payload,
+        json: true
+    }, function(err, res, body) {
+        if (err) {
+            console.log(err);
+        } else if (!err && res.statusCode == 200) {
+            console.log(body.data.affected + " Machines have initiated Sentinel One Scan.")
+        } else {
+            console.log("HTTP Status Code: " + res.statusCode);
+            console.log(body);
+        }
+    });
+
+}
+
+function UpdateAgentsBySite(siteId) {
+    let payload = {
+        "data": {
+            "osType": "windows",
+            "packageId": "3.5.3.35"
+        },
+        "filter": {
+            "locationIds": [
+                siteId
+            ]
+        }
+    }
+    baseRequest.post({
+        uri: 'agents/actions/update-software',
+        body: payload,
+        json: true
+    }, function(err, res, body) {
+        if (err) {
+            console.log(err);
+        } else if (!err && res.statusCode == 200) {
+            console.log(body.data.affected + " Machines have initiated Sentinel One Software Update.")
+        } else {
+            console.log("HTTP Status Code: " + res.statusCode);
+            console.log(body);
+        }
+    })
+}
+
 
 var argv = yargs
     .usage('Usage: $0 <command> [args]')
@@ -197,6 +250,32 @@ var argv = yargs
             if(err){console.log(err);}
             GetAgents(res);
         });
+    })
+    .command('scan', 'Scan agents by site name', function(yargs) {
+        argv = yargs.option('c', {
+            alias: 'client',
+            describe: 'Client name (Same as Site Name)',
+            type: 'string',
+            demandOption: true
+        })
+    }, function (argv) {
+        GetSiteByName(argv.client, function(err, res) {
+            if(err){console.log(err);}
+            ScanAgentsBySite(res);
+        })
+    })
+    .command('update', 'Update Sentinel One Agent Software', function(yargs) {
+        argv = yargs.option('c', {
+            alias: 'client',
+            describe: 'Client Name (Same as Site Name)',
+            type: 'string',
+            demandOption: true
+        })
+    }, function (argv) {
+        GetSiteByName(argv.client, function(err, res) {
+            if(err){console.log(err);}
+            UpdateAgentsBySite(res);
+        })
     })
     .command('delete', 'Delete a site by ID', function (yargs) {
         argv = yargs.option('i', {
