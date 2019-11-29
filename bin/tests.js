@@ -34,7 +34,8 @@ function GetAllSites(target) {
                     disp.push(
                         { 'Name': s.name },
                         { 'ID': s.id },
-                        { 'Token': s.registrationToken }
+                        { 'Token': s.registrationToken },
+                        { "Active Agents": s.activeLicenses }
                     );
                     console.log(disp.toString());
                 }
@@ -44,6 +45,21 @@ function GetAllSites(target) {
             console.log(body);
         }
     })
+}
+
+function GetSiteByName(siteName, callback) {
+    baseRequest.get("sites?name=" + siteName, function(err, res, body) {
+        if (err) {
+            console.log(err);
+        } else if (!err && res.statusCode == 200) {
+            let info = JSON.parse(body);
+            let data = info.data.sites[0].id;
+            return callback(null, data);
+        } else {
+            console.log("HTTP Status Code: " + res.statusCode);
+            console.log(body);
+        }
+    });
 }
 
 //  Function to Get a Site by Token
@@ -106,6 +122,43 @@ function CreateSite(Name) {
     });
 }
 
+//  Function that returns all agents for a client
+async function GetAgents(siteId, target) {
+    if (target == undefined) {
+        target = "agents?siteIds=" + siteId;
+    }
+    baseRequest.get(target, function(err, res, body) {
+        if (err) {
+            console.log(err)
+        } else if (!err && res.statusCode == 200) {
+            let agents = [];
+            let info = JSON.parse(body);
+            info.data.forEach(a => {
+                if (a.siteId === siteId) {
+                    agents.push(a);
+                }
+            })
+            if (info.pagination.nextCursor !== null) {
+                GetAgents(siteId, "agents?cursor=" + info.pagination.nextCursor);
+            }
+            agents.forEach(a => {
+                let disp = new table();
+                disp.push(
+                    { 'Name': a.computerName },
+                    { 'Threats': a.activeThreats },
+                    { 'OS': a.osName },
+                    { 'Client': a.siteName },
+                    { 'Agent ID': a.id }
+                );
+                console.log(disp.toString());
+            })
+        } else {
+            console.log("HTTP Status Code: " + res.statusCode);
+            console.log(body);
+        }
+    })
+}
+
 
 var argv = yargs
     .usage('Usage: $0 <command> [args]')
@@ -131,6 +184,19 @@ var argv = yargs
         })
     }, function (argv) {
         GetSite(argv.token);
+    })
+    .command('agents', 'list agents by client', function(yargs) {
+        argv = yargs.option('c', {
+            alias: 'client',
+            describe: 'Client name (Same as Site Name)',
+            type: 'string',
+            demandOption: true
+        })
+    }, function (argv) {
+        GetSiteByName(argv.client, function(err, res){
+            if(err){console.log(err);}
+            GetAgents(res);
+        });
     })
     .command('delete', 'Delete a site by ID', function (yargs) {
         argv = yargs.option('i', {
