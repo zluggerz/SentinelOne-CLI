@@ -123,7 +123,7 @@ function CreateSite(Name) {
 }
 
 //  Function that returns all agents for a client
-async function GetAgents(siteId, target) {
+function GetAgents(siteId, target) {
     if (target == undefined) {
         target = "agents?siteIds=" + siteId;
     }
