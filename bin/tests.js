@@ -12,6 +12,36 @@ const baseRequest = request.defaults({
     }
 });
 
+// Get list of threats
+function getAllThreats() {
+    baseRequest.get("threats", function(err, res, body){
+        if (err) {
+            console.log(err);
+        } else if (!err && res.statusCode == 200) {
+            let info = JSON.parse(body);
+            let data = info.data;
+            data.forEach(t => {
+                let disp = new table();
+                disp.push(
+                    { 'Domain': t.agentdomain },
+                    { 'Client': t.siteName },
+                    { 'Agent': t.agentComputerName },
+                    { 'Description': t.description },
+                    { 'File': t.fileDisplayName },
+                    { 'Path': t.filePath },
+                    { 'Resolved?': t.resolved },
+                    { 'Agent ID': t.agentId }
+                )
+                console.log(disp.toString());
+            })
+            console.log(data[0].agentId);
+        } else {
+            console.log("HTTP Status Code: " + res.statusCode);
+            console.log(body);
+        }
+    })
+}
+
 //  Function that returns all sites qand prints vital info to the terminal
 function GetAllSites(target) {
     if (target === undefined){ target = "sites" }
@@ -286,6 +316,9 @@ var argv = yargs
         })
     }, function (argv) {
         DeleteSite(argv.id);
+    })
+    .command('threats', 'List threats found by Sentinel One', function (yargs) {
+        getAllThreats();
     })
     .help('help')
     .argv
