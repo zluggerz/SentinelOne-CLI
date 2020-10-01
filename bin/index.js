@@ -75,7 +75,7 @@ function CreateSite(Name) {
                 "siteType": "Paid",
                 "name": Name,
                 "totalLicenses": 200,
-                "sku": "Core",
+                "sku": "Control",
                 "inherits": true,
                 "suite": "Core",
                 "accountId": "706656516881151446"
